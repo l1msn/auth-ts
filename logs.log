@@ -1,0 +1,2 @@
+[2022-07-22T12:45:17.265] [INFO] default - Access connecting to DB to URI: mongodb://127.0.0.1:27017/auth
+[2022-07-22T12:45:17.270] [INFO] default - Server is working on http://localhost:5000

@@ -1,0 +1,36 @@
+version: '3.0'
+
+services:
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - 27017:27017
+    restart: always
+  server:
+    container_name: server
+    build:
+      context: server
+      dockerfile: Dockerfile
+    env_file:
+      - server/.env
+    volumes:
+      - .:/server
+      - /auth_modules/node_modules
+    ports:
+      - 5000:5000
+    command: node server.js
+    depends_on:
+      - mongo
+    restart: always
+  client:
+      container_name: client
+      build:
+        context: client
+        dockerfile: Dockerfile
+      ports:
+        - 3000:3000
+      command: npm run start
+      depends_on:
+        - server
+      restart: always
