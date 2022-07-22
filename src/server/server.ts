@@ -7,13 +7,12 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-//Инициализация модулей !!! исправить !!!
+//Инициализация модулей
 import {logger} from "./logger/logger"
-/*
-const router = require("./routes/index");
-const errorMiddleware = require("./middleware/errorMiddleware")
+import {router} from "./routes/index";
+import {errorMiddleware} from "./middleware/errorMiddleware";
 
- */
+
 //Инициализируем Express
 const app: Application = express();
 
@@ -34,13 +33,13 @@ app.use(cors({
     origin: process.env.CLIENT_URL
 }));
 
-/*
+
 //Маршрутизация
 app.use("/auth",router);
 
 app.use(errorMiddleware);
 
- */
+
 
 //Запускаем сервер
 (async ()=>{

@@ -37,4 +37,4 @@ router.get("/users", authMiddleware, userController.getUsers);
 
 
 //Экспортируем данный модуль
-module.exports = router;
+export {router};

@@ -30,4 +30,4 @@ function errorHandler(error, request, response, next) {
 }
 
 //Экспортируем данный модуль
-module.exports = errorHandler;
+export {errorHandler};
