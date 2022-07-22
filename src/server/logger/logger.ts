@@ -15,4 +15,4 @@ configure({
 
 const logger = getLogger();
 
-export {logger};
+export default logger;

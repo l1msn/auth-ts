@@ -1,5 +1,8 @@
 //Инициализация модулей
-const authError = require("../exceptions/authError")
+import {NextFunction} from "express";
+
+import authError from "../exceptions/authError";
+import logger from "../logger/logger"
 /**
  * @description - Функция обработчик ошибок
  * @function
@@ -9,7 +12,7 @@ const authError = require("../exceptions/authError")
  * @param response - ответ от сервера
  * @param next - следующая middleware
  */
-function errorHandler(error, request, response, next) {
+function errorHandler(error: Error, request: Request, response: Response, next: NextFunction) {
     try {
         //Выводим ошибку в логи
         console.log(error);
@@ -30,4 +33,4 @@ function errorHandler(error, request, response, next) {
 }
 
 //Экспортируем данный модуль
-export {errorHandler};
+export default errorHandler;

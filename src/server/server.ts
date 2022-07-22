@@ -8,9 +8,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 //Инициализация модулей
-import {logger} from "./logger/logger"
-import {router} from "./routes/index";
-import {errorMiddleware} from "./middleware/errorMiddleware";
+import logger from "./logger/logger"
+import router from "./routes/index";
+import errorHandler from "./middleware/errorMiddleware";
 
 
 //Инициализируем Express
@@ -37,7 +37,7 @@ app.use(cors({
 //Маршрутизация
 app.use("/auth",router);
 
-app.use(errorMiddleware);
+app.use(errorHandler);
 
 
 

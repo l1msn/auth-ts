@@ -1,13 +1,13 @@
 //Инициализация библиотек
-const Router = require("express").Router;
-const validator = require("express-validator")
+import {Router} from "express";
+import validator from "express-validator";
 
 //Инициализация модулей
-const userController = require("../controllers/userController");
-const authMiddleware = require("../middleware/authMiddleware");
+import {userController} from "../controllers/userController";
+import {authMiddleware} from "../middleware/authMiddleware";
 
 //Инициализируем Роутера
-const router = Router();
+const router: Router = Router();
 
 
 //Запросы Роутера
@@ -37,4 +37,4 @@ router.get("/users", authMiddleware, userController.getUsers);
 
 
 //Экспортируем данный модуль
-export {router};
+export default router;
