@@ -1,18 +1,19 @@
 /**
- * @description - Класс трансфера данных для пользоватея
+ * @description - Класс трансфера данных для пользователя
  * @class
  */
+
 class userDto {
     //Данные
-    email;
-    id;
-    isActivated;
+    email: string;
+    id: string;
+    isActivated: boolean;
     //Конструктор
-    constructor(model) {
+    constructor(model: any) {
         this.email = model.email;
         this.id = model._id;
         this.isActivated = model.isActivated;
     }
 }
 //Экспортируем данный модуль
-module.exports = userDto;
+export default userDto;

@@ -1,5 +1,5 @@
 //Инициализация модулей
-import {NextFunction} from "express";
+import {NextFunction, Request, Response} from "express";
 
 import authError from "../exceptions/authError";
 import logger from "../logger/logger"
@@ -12,10 +12,10 @@ import logger from "../logger/logger"
  * @param response - ответ от сервера
  * @param next - следующая middleware
  */
-function errorHandler(error: Error, request: Request, response: Response, next: NextFunction) {
+function errorHandler(error: authError | Error, request: Request, response: Response, next: NextFunction): any{
     try {
         //Выводим ошибку в логи
-        console.log(error);
+        logger.error(error);
         //Если это известная нам ошибка (описана в exceptions), то возвращаем уже готовую форму ошибки
         if (error instanceof authError) {
             logger.error(error);
@@ -27,8 +27,8 @@ function errorHandler(error: Error, request: Request, response: Response, next: 
         return response.status(500).json({message: "Unexpected error from server"});
     } catch (error) {
         //Обрабатываем ошибки и отправляем статус код
-        console.log("Error on errorHandler in errorMiddleware")
-        console.log(error);
+        logger.warn("Error on errorHandler in errorMiddleware")
+        logger.error(error);
     }
 }
 

@@ -3,8 +3,8 @@ import {Router} from "express";
 import validator from "express-validator";
 
 //Инициализация модулей
-import {userController} from "../controllers/userController";
-import {authMiddleware} from "../middleware/authMiddleware";
+import userController from "../controllers/userController";
+import authMiddleware from "../middleware/authMiddleware";
 
 //Инициализируем Роутера
 const router: Router = Router();

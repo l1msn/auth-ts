@@ -13,6 +13,4 @@ configure({
     }
 });
 
-const logger = getLogger();
-
-export default logger;
+export default getLogger();
