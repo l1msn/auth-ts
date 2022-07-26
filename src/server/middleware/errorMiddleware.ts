@@ -12,7 +12,7 @@ import logger from "../logger/logger"
  * @param response - ответ от сервера
  * @param next - следующая middleware
  */
-function errorHandler(error: authError | Error, request: Request, response: Response, next: NextFunction): any{
+function errorHandler(error: authError | Error, request: Request, response: Response, next: NextFunction): Response<any, Record<string, any>> | undefined{
     try {
         //Выводим ошибку в логи
         logger.error(error);
@@ -24,10 +24,10 @@ function errorHandler(error: authError | Error, request: Request, response: Resp
         //... могут быть еще другие ошибки
 
         //Если же это неизвестная ошибка, возвращаем готовую схему
-        return response.status(500).json({message: "Unexpected error from server"});
-    } catch (error) {
+        return response.status(500).json({message: "Unexpected error from server!"});
+    } catch (error: unknown | any) {
         //Обрабатываем ошибки и отправляем статус код
-        logger.warn("Error on errorHandler in errorMiddleware")
+        logger.warn("Error on errorHandler in errorMiddleware!")
         logger.error(error);
     }
 }

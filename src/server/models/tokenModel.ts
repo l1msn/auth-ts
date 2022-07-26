@@ -1,15 +1,16 @@
 //Инициализация библиотек
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import User from "./userModel"
+import IToken from "./IModels/iToken";
 
-//Инициализация модулей
+
 
 //Схема refresh token
 /**
  * @description - Схема refresh token
  * @scheme
  */
-const Token = mongoose.model('Token',
-    new mongoose.Schema({
+const tokenSchema: mongoose.Schema = new mongoose.Schema({
         //Ссылка на пользователя в БД
         user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
         //refresh Token пользователя
@@ -20,8 +21,8 @@ const Token = mongoose.model('Token',
         }
     }, {
         versionKey: false
-    })
+    }
 );
 
 //Экспортируем данный модуль
-module.exports = Token;
+export default mongoose.model<IToken>('Token', tokenSchema);

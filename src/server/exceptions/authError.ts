@@ -1,3 +1,9 @@
+/**
+ * @description - Кастомный класс ошибки
+ * @default
+ * @class
+ * @extends Error
+ */
 class AuthError extends Error{
     status: number;
     errors: string[];

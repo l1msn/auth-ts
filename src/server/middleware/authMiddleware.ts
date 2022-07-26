@@ -1,5 +1,6 @@
 import authError from "../exceptions/authError";
 import tokenService from "../services/tokenService";
+import {JwtPayload} from "jsonwebtoken"
 import {NextFunction, Request, Response} from "express";
 
 /**
@@ -10,7 +11,7 @@ import {NextFunction, Request, Response} from "express";
  * @param response - ответ
  * @param next - следующая middleware
  */
-function authHandler(request: Request, response: Response, next: NextFunction): NextFunction | void {
+function authHandler(request: Request, response: Response, next: NextFunction): void {
     try {
         //Получаем Access token из request
         const authHeader: string | undefined = request.headers.authorization;
@@ -24,13 +25,14 @@ function authHandler(request: Request, response: Response, next: NextFunction): 
             return next(authError.unauthorizedError());
 
         //Проверяем полученный токен на валидность
-        const userData: string | undefined = tokenService.validateAccessToken(accessToken);
+        const userData: Promise<string | JwtPayload | undefined> = tokenService.validateAccessToken(accessToken);
         //Если не валидный, то ошибочка вышла)))
         if(!userData)
             return next(authError.unauthorizedError());
 
         //Ну сохраняем данные
-        request.body['user'] = userData;
+        //request.user = user;
+        request.body.user = userData;
         next();
     } catch (error: unknown | any) {
         return next(authError.unauthorizedError());

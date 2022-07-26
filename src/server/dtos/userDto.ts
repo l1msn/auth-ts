@@ -2,7 +2,6 @@
  * @description - Класс трансфера данных для пользователя
  * @class
  */
-
 class userDto {
     //Данные
     email: string;

@@ -1,9 +1,16 @@
 //Инициализация библиотек
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
+import jwt from "jsonwebtoken";
+import logger from "../logger/logger"
+import mongoose from "mongoose"
+import dotenv from "dotenv";
+
+dotenv.config();
 
 //Инициализация модулей
-const Token = require("../models/tokenModel");
+import Token from "../models/tokenModel";
+import IToken from "../models/IModels/iToken";
+import {DeleteResult} from "mongodb";
+
 /**
  * @description - Класс сервис для генерации токенов и их обновления
  * @class
@@ -15,39 +22,39 @@ class tokenService{
      * @async
      * @param payload - информация о пользователе
      */
-    async generateToken(payload){
+    async generateToken(payload: any): Promise<{accessToken: string, refreshToken: string} | undefined> {
         try {
             //Генерация access Token
-            console.log("Generating access Token...")
-            const accessToken = jwt.sign(payload,
-                (process.env.SECRED_CODE_ACCESS || "secret-code-access")
+            logger.log("Generating access Token...")
+            const accessToken: string | undefined = jwt.sign(payload,
+                (process.env.SECRED_CODE_ACCESS as string)
                 , {expiresIn: "30m"}
             );
             //Если произошла ошибка - выбрасываем ее
             if(!accessToken)
-                throw new Error("Error on generating access Token");
-            console.log("Access Token is: " + accessToken)
+                throw new Error("Error on generating access Token!");
+            logger.log("Access Token is: " + accessToken)
 
             //Генерация refresh Token
-            console.log("Generating refresh Token...")
-            const refreshToken = jwt.sign(payload,
-                (process.env.SECRED_CODE_REFRESH || "secret-code-refresh")
+            logger.log("Generating refresh Token...")
+            const refreshToken: string | undefined = jwt.sign(payload,
+                (process.env.SECRED_CODE_REFRESH as string)
                 , {expiresIn: "7d"}
             );
             //Если произошла ошибка - выбрасываем ее
             if(!refreshToken)
-                throw new Error("Error on generating refresh Token");
-            console.log("Refresh Token is: " + refreshToken)
+                throw new Error("Error on generating refresh Token!");
+            logger.log("Refresh Token is: " + refreshToken)
 
             //Возвращаем Token'ы
             return {
                 accessToken,
                 refreshToken
             }
-        } catch (error) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on generateToken in Token service")
-            console.log(error);
+            logger.warn("Error on generateToken in Token service!")
+            logger.error(error);
         }
     }
 
@@ -58,30 +65,31 @@ class tokenService{
      * @param userId - id пользователя
      * @param refreshToken - refresh Token пользователя
      */
-    async saveToken(userId,refreshToken){
+    async saveToken(userId: string,refreshToken: string): Promise<(mongoose.Document<unknown, any, IToken> & IToken & {_id: mongoose.Types.ObjectId}) | undefined>{
         try {
             //Поиск существующего token
-            console.log("Searching already exist refreshToken")
+            logger.log("Searching already exist refreshToken...")
             const tokenData = await Token.findOne({user: userId});
             //Если такой token есть, то обновляем его
             if (tokenData) {
+                logger.log("refreshToken found.")
                 tokenData.refreshToken = refreshToken;
                 return tokenData.save();
             }
-
             //Создание нового token
-            console.log("Generating new refresh Token...")
+            logger.log("Generating new refresh Token...")
             const token = await Token.create({user: userId, refreshToken: refreshToken});
             //Если при генерации произошла ошибка - то выбрасываем ее
             if (!token)
-                throw new Error("Error on creating token on Token service");
+                throw new Error("Error on creating token on Token service!");
 
             //Возвращаем новый refresh Token
+            logger.log("Generated new refresh Token.")
             return token;
-        } catch (error) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on saveToken in Token service")
-            console.log(error);
+            logger.warn("Error on saveToken in Token service!")
+            logger.error(error);
         }
     }
 
@@ -91,22 +99,22 @@ class tokenService{
      * @function
      * @param refreshToken - токен для выхода
      */
-    async removeToken(refreshToken){
+    async removeToken(refreshToken: string): Promise<DeleteResult | undefined>{
         try {
-            console.log("Removing Token from DB...")
+            logger.info("Removing Token from DB...")
             //Удаляем токен из БД
-            const tokenData = await Token.deleteOne({refreshToken: refreshToken});
+            const tokenData: DeleteResult = await Token.deleteOne({refreshToken: refreshToken});
             //Если там нет такого токена, то выбрасываем ошибку
             if (!tokenData)
-                throw new Error("Error on deleting token in DB");
+                throw new Error("Error on deleting token in DB!");
 
-            console.log("Success removing Token from DB");
+            logger.info("Success removing Token from DB.");
             //Возвращаем информацию об этом
             return tokenData;
-        } catch (error) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on removeToken in Token service")
-            console.log(error);
+            logger.warn("Error on removeToken in Token service!")
+            logger.error(error);
         }
     }
 
@@ -116,21 +124,21 @@ class tokenService{
      * @method
      * @param refreshToken - текущий refreshToken
      */
-    async findToken(refreshToken){
+    async findToken(refreshToken: string): Promise<(mongoose.Document<unknown, any, IToken> & IToken & {_id: mongoose.Types.ObjectId}) | undefined>{
         try {
-            console.log("Searching Token in DB...");
+            logger.info("Searching Token in DB...");
             //Удаляем токен из БД
             const tokenData = await Token.findOne({refreshToken: refreshToken});
             //Если там нет такого токена, то выбрасываем ошибку
             if (!tokenData)
-                throw new Error("Error on deleting token in DB");
+                throw new Error("Error on deleting token in DB!");
             //Возвращаем информацию об этом
-            console.log("Token found in DB");
+            logger.info("Token found in DB.");
             return tokenData;
-        } catch (error) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on removeToken in Token service")
-            console.log(error);
+            logger.warn("Error on removeToken in Token service!")
+            logger.error(error);
         }
     }
 
@@ -140,22 +148,22 @@ class tokenService{
      * @method
      * @param token - токен
      */
-    async validateAccessToken(token){
+    async validateAccessToken(token: string): Promise<string | jwt.JwtPayload | undefined>{
         try {
             //Валидируем токен
-            console.log("Validating Access Token...");
-            const userData = jwt.verify(token, process.env.SECRED_CODE_ACCESS || "secret-code-access");
+            logger.info("Validating Access Token...");
+            const userData: string | jwt.JwtPayload = jwt.verify(token, process.env.SECRED_CODE_ACCESS as string);
             //Если произошла ошибка валидации, то выбрасываем ее
             if(!userData)
-                throw new Error("Error on validate Access Token");
+                throw new Error("Error on validate Access Token!");
 
             //Возвращаем данные об этом
-            console.log("Validating Access Token success");
+            logger.info("Validating Access Token success.");
             return userData;
-        } catch (error) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on validateAccessToken in Token service")
-            console.log(error);
+            logger.warn("Error on validateAccessToken in Token service!")
+            logger.error(error);
         }
     }
 
@@ -165,25 +173,25 @@ class tokenService{
      * @method
      * @param token - токен
      */
-    async validateRefreshToken(token){
+    async validateRefreshToken(token: string): Promise<string | jwt.JwtPayload | undefined>{
         try {
             //Валидируем токен
-            console.log("Validating Refresh Token...");
-            const userData = jwt.verify(token, process.env.SECRED_CODE_REFRESH || "secret-code-refresh");
+            logger.info("Validating Refresh Token...");
+            const userData: string | jwt.JwtPayload = jwt.verify(token, process.env.SECRED_CODE_REFRESH as string);
             //Если произошла ошибка валидации, то выбрасываем ее
             if(!userData)
-                throw new Error("Error on validate Access Token");
+                throw new Error("Error on validate Access Token!");
 
             //Возвращаем данные об этом
-            console.log("Validating Refresh Token success");
+            logger.info("Validating Refresh Token success.");
             return userData;
         } catch (error) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on validateRefreshToken in Token service")
-            console.log(error);
+            logger.warn("Error on validateRefreshToken in Token service!")
+            logger.error(error);
         }
     }
 }
 
 //Экспортируем данный модуль
-module.exports = new tokenService();
+export default new tokenService();

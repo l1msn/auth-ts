@@ -32,16 +32,16 @@ class App {
         }
     }
 
-    private async database() {
+    private database() {
         try {
             logger.log("Database connecting...");
 
-            await mongoose.connect(
-                "mongodb://" + process.env.MONGO_HOST + ":" + process.env.MONGO_PORT + "/" + process.env.MONGO_NAME
-            );
+            mongoose.connect(
+                "mongodb://" + process.env.MONGO_HOST as string + ":" + process.env.MONGO_PORT as string + "/" + process.env.MONGO_NAME as string
+            ).catch(()=> {throw new Error("Error on mongoose connect!")});
 
             logger.log("Database connected.");
-        } catch (error: unknown | Error) {
+        } catch (error: unknown | any) {
             logger.warn("Error on connection to DataBase of Application!");
             logger.error(error);
         }
@@ -62,7 +62,7 @@ class App {
             }));
 
             logger.log("Middlewares included.");
-        } catch (error: unknown | Error) {
+        } catch (error: unknown | any) {
             logger.warn("Error on including middlewares of Application!");
             logger.error(error);
         }
@@ -72,10 +72,10 @@ class App {
             logger.log("Middlewares including...");
 
             //Маршрутизация
-            this.express.use("/auth",router);
+            this.express.use("/auth", router);
 
             logger.log("Middlewares included.");
-        } catch (error: unknown | Error) {
+        } catch (error: unknown | any) {
             logger.warn("Error on including routes of Application!");
             logger.error(error);
         }
@@ -88,7 +88,7 @@ class App {
             this.express.use(errorHandler);
 
             logger.log("Error middleware included.");
-        } catch (error: unknown | Error) {
+        } catch (error: unknown | any) {
             logger.warn("Error on creating including Error Middleware object!");
             logger.error(error);
         }

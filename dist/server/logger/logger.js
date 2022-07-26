@@ -13,5 +13,4 @@ const log4js_1 = require("log4js");
         }
     }
 });
-const logger = (0, log4js_1.getLogger)();
-exports.default = logger;
+exports.default = (0, log4js_1.getLogger)();

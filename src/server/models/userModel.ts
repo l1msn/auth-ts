@@ -1,15 +1,14 @@
 //Инициализация библиотек
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import IUser from "./IModels/iUser"
 
-//Инициализация модулей
 
 //Схема пользователя
 /**
  * @description - Схема пользователя
  * @scheme
  */
-const User = mongoose.model('User',
-    new mongoose.Schema({
+const userSchema: mongoose.Schema  = new mongoose.Schema({
         //Имя
         name: { type: String },
         //Почта
@@ -28,8 +27,8 @@ const User = mongoose.model('User',
         }
     }, {
         versionKey: false
-    })
+    }
 );
 
 //Экспортируем данный модуль
-module.exports = User;
+export default mongoose.model<IUser>('User', userSchema);

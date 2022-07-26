@@ -1,14 +1,23 @@
 //Инициализация библиотек
-const bcrypt = require("bcryptjs");
-const uuid = require("uuid");
-require("dotenv").config();
+import bcrypt from "bcryptjs";
+import uuid from "uuid";
+import logger from "../logger/logger";
+import mongoose from "mongoose";
+import {DeleteResult} from "mongodb";
+import {JwtPayload} from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 //Инициализация модулей
-const User = require("../models/userModel");
-const emailService = require("./emailService");
-const tokenService = require("./tokenService");
-const authError = require("../exceptions/authError");
-const UserDto = require("../dtos/userDto");
+import User from "../models/userModel";
+import IToken from "../models/IModels/iToken"
+import IUser from "../models/IModels/iUser"
+import emailService from "./emailService";
+import tokenService from "./tokenService";
+import authError from "../exceptions/authError";
+import UserDto from "../dtos/userDto";
+
 //Класс сервис для аутентификации и действий пользователя
 /**
  * @description - Класс сервис для аутентификации и действий пользователя
@@ -22,75 +31,74 @@ class userService{
      * @param email - email пользователя
      * @param password - пароль пользователя
      */
-    async registration(email,password){
+    async registration(email: string,password: string): Promise<any>{
         try {
             //Ищем пользователя в БД
-            console.log("Checking for already exist user...");
+            logger.log("Checking for already exist user...");
             const candidate = await User.findOne({email: email});
             //Если такой пользователь есть - выбрасываем ошибку
             if(candidate)
-                throw new Error("User already exist");
-            console.log("User not found - creating new")
+                throw new Error("User already exist!");
+            logger.log("User not found - creating new.")
 
             //Хэшируем пароль
-            console.log("Hashing password...");
-            const hashPassword = bcrypt.hashSync(password,bcrypt.genSaltSync(3));
+            logger.log("Hashing password...");
+            const hashPassword: string | undefined = bcrypt.hashSync(password,bcrypt.genSaltSync(3));
             //Если произошла ошибка шифрования - выбрасываем ошибку
             if(!hashPassword)
-                throw new Error("Hash password error");
-            console.log("Hash password is: " + hashPassword);
+                throw new Error("Hash password error!");
+            logger.log("Hash password is: " + hashPassword);
 
             //Генерируем строку для ссылки активации
-            console.log("Generating new activationLink...");
-            const activationLink = uuid.v4();
+            logger.log("Generating new activationLink...");
+            const activationLink: string | undefined = uuid.v4();
             //Если произошла ошибка при генерации - то выбрасываем ошибку
             if(!activationLink)
-                throw new Error("Error to generate link")
-            console.log("Activation link is: " + activationLink);
+                throw new Error("Error to generate link!")
+            logger.log("Activation link is: " + activationLink);
 
             //Помещаем пользователя в БД
-            console.log("Adding new user to DB...");
+            logger.log("Adding new user to DB...");
             const user = await User.create({email: email, password: hashPassword, activationLink: activationLink});
             //Если не получается поместить в БД - выбрасываем ошибку
             if(!user)
-                throw new Error("Error save user");
-            console.log("New user is: " + user);
+                throw new Error("Error save user!");
+            logger.log("New user is: " + user);
 
             //Отправляем на почту ссылку на активацию
-            console.log("Sending message to email...")
+            logger.log("Sending message to email...")
             await emailService.sendActivationEmail(email,
-                (("http://localhost:" + process.env.PORT) || "http://localhost:3000")
+                ("http://localhost:" + process.env.PORT as string)
                         + "/auth/activate/" + activationLink);
 
             //Создаем объект для трансфера данных пользователя
-            console.log("Creating Dto for user...")
-            const userDto = new UserDto(user);
+            logger.log("Creating Dto for user...")
+            const userDto: UserDto | undefined = new UserDto(user);
             //Если не удается создать - то выбрасываем ошибку
             if(!userDto)
-                throw new Error("Error on creating user");
-            console.log(userDto);
+                throw new Error("Error on creating user!");
 
             //Генерируем токены
-            console.log("Generating new tokens...")
-            const tokens = await tokenService.generateToken({...userDto});
+            logger.log("Generating new tokens...")
+            const tokens: {accessToken: string, refreshToken: string} | undefined = await tokenService.generateToken({...userDto});
             //Если не удается создать - то выбрасываем ошибку
             if(!tokens)
-                throw new Error("Error on generating tokens");
+                throw new Error("Error on generating tokens!");
 
             //Сохраняем или обновляем токен
-            console.log("Saving or update refresh token...")
+            logger.log("Saving or update refresh token...")
             await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
             //Возвращаем токены и информацию о пользователе
-            console.log("Sending info and tokens...");
+            logger.log("Sending info and tokens...");
             return {
                 ...tokens,
                 user: userDto
             }
-        } catch (error) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on registration in User service")
-            console.log(error);
+            logger.log("Error on registration in User service!")
+            logger.log(error);
         }
 
     }
@@ -101,21 +109,20 @@ class userService{
      * @async
      * @param activationLink - ссылка активации
      */
-    async activate(activationLink){
+    async activate(activationLink: string): Promise<void>{
         try {
             //Поиск пользователя по ссылке
             const user = await User.findOne({activationLink: activationLink});
             if (!user)
-                throw new Error("Uncorrected link");
+                throw new Error("Uncorrected link!");
 
             //Изменение поля на активированный
             user.isActivated = true;
             await user.save();
-            console.log(user.isActivated);
-        } catch (error) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on activating in User service")
-            console.log(error);
+            logger.log("Error on activating in User service!")
+            logger.log(error);
         }
     }
 
@@ -125,52 +132,52 @@ class userService{
      * @param email - email пользователя
      * @param password - пароль пользователя
      */
-    async login(email, password) {
+    async login(email: string, password: string): Promise<{user: UserDto, accessToken: string, refreshToken: string} | undefined> {
         try {
             //Ищем пользователя в БД
-            console.log("Checking for already exist user...");
+            logger.log("Checking for already exist user...");
             const user = await User.findOne({email: email});
             //Если такой пользователь есть - выбрасываем ошибку
             if (!user)
-                throw new Error("User not exist");
+                throw new Error("User not exist!");
 
             //Расхэшируем пароль
-            console.log("Rehashing password...");
-            const isEqualPassword = bcrypt.compareSync(password, user.password);
+            logger.log("Rehashing password...");
+            const isEqualPassword: boolean = bcrypt.compareSync(password, user.password);
             //Если произошла ошибка шифрования - выбрасываем ошибку
             if (!isEqualPassword)
-                throw new Error("Password not equal");
-            console.log("Password equal: " + isEqualPassword);
+                throw new Error("Password not equal!");
+            logger.log("Password equal: " + isEqualPassword);
 
             //Создаем объект для трансфера данных пользователя
-            console.log("Creating Dto for user...")
-            const userDto = new UserDto(user);
+            logger.log("Creating Dto for user...")
+            const userDto: UserDto | undefined = new UserDto(user);
             //Если не удается создать - то выбрасываем ошибку
             if (!userDto)
-                throw new Error("Error on creating user");
-            console.log("User Dto created: " + userDto);
+                throw new Error("Error on creating user!");
+            logger.log("User Dto created: " + userDto);
 
             //Генерируем токены
-            console.log("Generating new tokens...")
-            const tokens = await tokenService.generateToken({...userDto});
+            logger.log("Generating new tokens...")
+            const tokens: {accessToken: string, refreshToken: string} | undefined = await tokenService.generateToken({...userDto});
             //Если не удаться создать - то выбрасываем ошибку
             if (!tokens)
-                throw new Error("Error on generating tokens");
+                throw new Error("Error on generating tokens!");
 
             //Сохраняем или обновляем токен
-            console.log("Saving or update refresh token...")
+            logger.log("Saving or update refresh token...")
             await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
             //Возвращаем токены и информацию о пользователе
-            console.log("Sending info and tokens...");
+            logger.log("Sending info and tokens...");
             return {
                 ...tokens,
                 user: userDto
             }
-        } catch (error) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on login in User service")
-            console.log(error);
+            logger.log("Error on login in User service")
+            logger.log(error);
         }
     }
 
@@ -180,20 +187,21 @@ class userService{
      * @method
      * @param refreshToken - токен для выхода
      */
-    async logout(refreshToken){
+    async logout(refreshToken: string): Promise<DeleteResult | undefined>{
         try {
+            logger.log("Deleting token...")
             //Удаляем токен из БД
-            const token = await tokenService.removeToken(refreshToken);
+            const token: DeleteResult | undefined = await tokenService.removeToken(refreshToken);
             //Если не получилось удалить токен, то выкидываем ошибку
             if(!token)
-                throw new Error("Error on removing token")
+                throw new Error("Error on removing token!")
             //Возвращаем данные о выходе пользователя и удалении токена
-            console.log("Success deleting token")
+            logger.log("Success deleting token.")
             return token;
-        } catch (error) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on logout in User service")
-            console.log(error);
+            logger.log("Error on logout in User service!")
+            logger.log(error);
         }
     }
 
@@ -203,55 +211,56 @@ class userService{
      * @method
      * @param refreshToken - текущий refresh Token
      */
-    async refresh(refreshToken){
+    async refresh(refreshToken: string): Promise<{user: UserDto, accessToken: string, refreshToken: string} | undefined>{
         try {
             //Проверка на наличие самого токена
             if (!refreshToken)
-                throw new Error("Not found Token");
+                throw new Error("Not found Token!");
 
             //Проводим валидацию самого Токена
-            const userData = tokenService.validateRefreshToken(refreshToken);
+            const userData: Promise<string | JwtPayload | undefined> | undefined = tokenService.validateRefreshToken(refreshToken);
             //Если валидация неудачная, то выбрасываем ошибку
             if(!userData)
-                throw authError.unauthorizedError("Validation token error");
+                throw authError.unauthorizedError();
 
             //Ищем сам токен в БД
-            const tokenFromDb = tokenService.findToken(refreshToken);
+            const tokenFromDb: Promise<(mongoose.Document<unknown, any, IToken> & IToken & {_id: mongoose.Types.ObjectId}) | undefined> | undefined
+                = tokenService.findToken(refreshToken);
             //Если его там нет, то выбрасываем ошибку
             if(!tokenFromDb)
-                throw authError.unauthorizedError("Not found token in DB");
+                throw authError.unauthorizedError();
 
             //Создаем объект для трансфера данных пользователя
-            console.log("Creating Dto for user...");
-            const user = await User.findOne(userData.id);
-            console.log(user);
-            const userDto = new UserDto(user);
+            logger.log("Creating Dto for user...");
+
+            const user: (mongoose.Document<unknown, any, IUser> & IUser & {_id: mongoose.Types.ObjectId}) | null
+                = await User.findOne(userData.then(id => {return id}));
+            const userDto: UserDto | undefined = new UserDto(user);
             //Если не удается создать - то выбрасываем ошибку
             if(!userDto)
-                throw new Error("Error on creating user");
-            console.log(userDto);
+                throw new Error("Error on creating user!");
 
             //Генерируем токены
-            console.log("Generating new tokens...")
+            logger.log("Generating new tokens...")
             const tokens = await tokenService.generateToken({...userDto});
             //Если не удается создать - то выбрасываем ошибку
             if(!tokens)
-                throw new Error("Error on generating tokens");
+                throw new Error("Error on generating tokens!");
 
             //Сохраняем или обновляем токен
-            console.log("Saving or update refresh token...")
+            logger.log("Saving or update refresh token...")
             await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
             //Возвращаем токены и информацию о пользователе
-            console.log("Sending info and tokens...");
+            logger.log("Sending info and tokens...");
             return {
                 ...tokens,
                 user: userDto
             }
-        } catch (error) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on refresh in User service")
-            console.log(error);
+            logger.log("Error on refresh in User service")
+            logger.log(error);
         }
     }
 
@@ -260,25 +269,25 @@ class userService{
      * @method
      * @async
      */
-    async getAllUsers(){
+    async getAllUsers(): Promise<(mongoose.Document<unknown, any, IUser> & IUser & {_id: mongoose.Types.ObjectId})[] | undefined>{
         try {
-            console.log("Taking data from DB...");
+            logger.log("Taking data from DB...");
             //Получаем всех пользователей из БД
-            const users = await User.find({});
+            const users: (mongoose.Document<unknown, any, IUser> & IUser & {_id: mongoose.Types.ObjectId})[] = await User.find({});
             //Если произошла ошибка, то выбрасываем ее
             if (!users)
-                throw new Error("Can't take data from DB");
+                throw new Error("Can't take data from DB!");
 
             //Возвращаем список всех пользователей
-            console.log("Success got data form DB");
+            logger.log("Success got data form DB");
             return users;
-        } catch (error) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            console.log("Error on getAllUsers in User service")
-            console.log(error);
+            logger.log("Error on getAllUsers in User service")
+            logger.log(error);
         }
     }
 }
 
 //Экспортируем данный модуль
-module.exports = new userService();
+export default new userService();
