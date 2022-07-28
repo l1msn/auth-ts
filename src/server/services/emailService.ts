@@ -1,6 +1,9 @@
 //Инициализация библиотек
-const nodeMailer = require("nodemailer");
-require("dotenv").config();
+import nodeMailer from "nodemailer";
+import logger from "../logger/logger"
+import dotenv from "dotenv";
+
+dotenv.config();
 
 //Инициализация модулей
 
@@ -8,62 +11,65 @@ require("dotenv").config();
  * @description - Класс сервис для отправки сообщения для активации пользователя
  * @class
  */
-class emailService{
+class emailService {
+    transporter: nodeMailer.Transporter;
+
     //Настройка стандартной конфигурации почты рассылки
     constructor() {
         this.transporter = nodeMailer.createTransport({
             //Сервис почты
-            service: "gmail",
+            // @ts-ignore
+            service: "Gmail",
             //Хост почты
-            host: (process.env.SMTP_HOST || "smtp.gmail.com"),
+            host: process.env.SMTP_HOST,
             //Порт почты
-            port: (process.env.SMTP_PORT || 587),
+            port: process.env.SMTP_PORT,
             //Защита по протоколу
             secure: false,
-            //Данные для аунтификации почты
+            //Данные для аутентификации почты
             auth: {
-                user: (process.env.SMTP_USER || "auth4pro@gmail.com"),
-                pass: (process.env.SMTP_PASSWORD || "ppmtywjqzibseeta")
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASSWORD
             }
-        })
+        });
     }
 
     /**
      * @description - Метод отправки сообщения
      * @method
      * @async
-     * @param to - почта куда отправляеться сообщение
+     * @param to - почта куда отправляется сообщение
      * @param link - ссылка активации
      */
-    async sendActivationEmail(to, link){
-        console.log("Sending email...")
+    async sendActivationEmail(to: string, link: string): Promise<void> {
+        logger.info("Sending email...")
         //Отправка сообщения
         await this.transporter.sendMail({
             //От кого
-            from: (process.env.SMTP_USER || "auth4pro@gmail.com"),
+            from: process.env.SMTP_USER,
             //Для кого
             to,
             //Заголовок
-            subject: "Активация аккаунта на " + (("http://localhost:" + process.env.PORT) || "http://localhost:3000"),
+            subject: "Активация аккаунта на " + ("http://localhost:" + process.env.PORT),
             //Текст сообщения
             text: "",
             html:
-            `
+                `
                 <div>
                     <h1>Для активации перейдите по ссылке</h1>
                     <a href="${link}">${link}</a>
                 </div>>
             `//Отлавливаем ошибки
-        },(error)=>{
-            if(error){
-                console.log("Email could not sent due to error");
-                console.log(error);
+        }, (error) => {
+            if (error) {
+                logger.error("Email could not sent due to error!");
+                logger.error(error);
             } else {
-                console.log("Email has been sent successfully");
+                logger.info("Email has been sent successfully!");
             }
         });
     }
 }
 
 //Экспортируем данный модуль
-module.exports = new emailService();
+export default new emailService();

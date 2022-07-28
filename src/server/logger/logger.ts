@@ -1,18 +1,16 @@
-import { getLogger, configure} from "log4js";
+import {getLogger, configure} from "log4js";
 
 configure({
-   appenders: {
-       app: {type: "file", filename: "logs.log"},
-       out: {type: 'stdout'}
-   },
+    appenders: {
+        app: {type: "file", filename: "logs.log"},
+        out: {type: 'stdout'}
+    },
     categories: {
-       default: {
-           appenders: ["app", "out"],
-           level: 'info'
-       }
+        default: {
+            appenders: ["app", "out"],
+            level: 'info'
+        }
     }
 });
 
-const logger = getLogger();
-
-export {logger};
+export default getLogger();

@@ -1,5 +1,8 @@
-const authError = require("../exceptions/authError");
-const tokenService = require("../services/tokenService");
+import authError from "../exceptions/authError";
+import tokenService from "../services/tokenService";
+import {JwtPayload} from "jsonwebtoken"
+import {NextFunction, Request, Response} from "express";
+import logger from "../logger/logger";
 
 /**
  * @description - Модуль проверки авторизированного пользователя
@@ -9,33 +12,36 @@ const tokenService = require("../services/tokenService");
  * @param response - ответ
  * @param next - следующая middleware
  */
-function authHandler(request,response,next) {
-    try{
+function authHandler(request: Request, response: Response, next: NextFunction): void {
+    try {
         //Получаем Access token из request
-        const authHeader = request.headers.authorization;
+        const authHeader: string | undefined = request.headers.authorization;
         //Если его тут нет, то выбрасываем ошибку
-        if(!authHeader)
+        if (!authHeader)
             return next(authError.unauthorizedError());
         //Отделяем непосредственно сам токен
-        const accessToken = authHeader.split(' ')[1];
+        const accessToken: string | undefined = authHeader.split(' ')[1];
         //Если не получается выделить строку, то выбрасываем ошибку
-        if(!accessToken)
+        if (!accessToken)
             return next(authError.unauthorizedError());
 
         //Проверяем полученный токен на валидность
-        const userData = tokenService.validateAccessToken(accessToken);
+        const userData: Promise<string | JwtPayload | undefined> = tokenService.validateAccessToken(accessToken);
         //Если не валидный, то ошибочка вышла)))
-        if(!userData)
+        if (!userData)
             return next(authError.unauthorizedError());
 
         //Ну сохраняем данные
-        request.user = userData;
+        //request.user = user;
+        request.body.user = userData;
         next();
-    } catch (error) {
+    } catch (error: unknown | any) {
+        logger.error("Error in authMiddleware!");
+        logger.error(error);
         return next(authError.unauthorizedError());
     }
 }
 
 
 //Экспортируем данный модуль
-module.exports = authHandler;
+export default authHandler;
