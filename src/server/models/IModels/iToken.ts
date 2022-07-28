@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface IToken extends Document{
+interface IToken extends Document {
     User: mongoose.Types.ObjectId;
     refreshToken: string;
     createDate: string;

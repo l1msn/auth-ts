@@ -4,7 +4,7 @@
  * @class
  * @extends Error
  */
-class AuthError extends Error{
+class AuthError extends Error {
     status: number;
     errors: string[];
 
@@ -14,11 +14,11 @@ class AuthError extends Error{
         this.errors = errors;
     }
 
-    static unauthorizedError(): AuthError{
-        return new AuthError(401,"User not authorized")
+    static unauthorizedError(): AuthError {
+        return new AuthError(401, "User not authorized")
     }
 
-    static badRequest(message: string, errors: string[] = []): AuthError{
+    static badRequest(message: string, errors: any[] = []): AuthError {
         return new AuthError(400, message, errors);
     }
 }

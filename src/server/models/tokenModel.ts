@@ -4,7 +4,6 @@ import User from "./userModel"
 import IToken from "./IModels/iToken";
 
 
-
 //Схема refresh token
 /**
  * @description - Схема refresh token
@@ -16,7 +15,8 @@ const tokenSchema: mongoose.Schema = new mongoose.Schema({
         //refresh Token пользователя
         refreshToken: {type: String, require: true},
         //Дата создания
-        createDate: { type: String, default:
+        createDate: {
+            type: String, default:
                 (new Intl.DateTimeFormat("ru", {dateStyle: "short", timeStyle: "short"}).format(new Date()))
         }
     }, {

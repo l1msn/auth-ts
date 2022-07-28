@@ -11,8 +11,9 @@ dotenv.config();
  * @description - Класс сервис для отправки сообщения для активации пользователя
  * @class
  */
-class emailService{
+class emailService {
     transporter: nodeMailer.Transporter;
+
     //Настройка стандартной конфигурации почты рассылки
     constructor() {
         this.transporter = nodeMailer.createTransport({
@@ -20,7 +21,7 @@ class emailService{
             // @ts-ignore
             service: "Gmail",
             //Хост почты
-            host: process.env.SMTP_HOST ,
+            host: process.env.SMTP_HOST,
             //Порт почты
             port: process.env.SMTP_PORT,
             //Защита по протоколу
@@ -37,15 +38,15 @@ class emailService{
      * @description - Метод отправки сообщения
      * @method
      * @async
-     * @param to - почта куда отправляеться сообщение
+     * @param to - почта куда отправляется сообщение
      * @param link - ссылка активации
      */
-    async sendActivationEmail(to: string, link: string): Promise<void>{
+    async sendActivationEmail(to: string, link: string): Promise<void> {
         logger.info("Sending email...")
         //Отправка сообщения
         await this.transporter.sendMail({
             //От кого
-            from: process.env.SMTP_USER ,
+            from: process.env.SMTP_USER,
             //Для кого
             to,
             //Заголовок
@@ -53,18 +54,18 @@ class emailService{
             //Текст сообщения
             text: "",
             html:
-            `
+                `
                 <div>
                     <h1>Для активации перейдите по ссылке</h1>
                     <a href="${link}">${link}</a>
                 </div>>
             `//Отлавливаем ошибки
-        },(error)=> {
-            if( error ){
-                logger.warn("Email could not sent due to error!");
+        }, (error) => {
+            if (error) {
+                logger.error("Email could not sent due to error!");
                 logger.error(error);
             } else {
-                logger.warn("Email has been sent successfully!");
+                logger.info("Email has been sent successfully!");
             }
         });
     }

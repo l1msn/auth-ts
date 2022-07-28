@@ -10,39 +10,41 @@ dotenv.config();
 import Token from "../models/tokenModel";
 import IToken from "../models/IModels/iToken";
 import {DeleteResult} from "mongodb";
+import UserDto from "../dtos/userDto";
 
 /**
  * @description - Класс сервис для генерации токенов и их обновления
  * @class
  */
-class tokenService{
+class tokenService {
     /**
      * @description - генерация токена
      * @method
      * @async
      * @param payload - информация о пользователе
      */
-    async generateToken(payload: any): Promise<{accessToken: string, refreshToken: string} | undefined> {
+    async generateToken(payload: UserDto)
+        : Promise<{ accessToken: string, refreshToken: string } | undefined> {
         try {
             //Генерация access Token
             logger.log("Generating access Token...")
-            const accessToken: string | undefined = jwt.sign(payload,
+            const accessToken: string | undefined = jwt.sign({...payload},
                 (process.env.SECRED_CODE_ACCESS as string)
                 , {expiresIn: "30m"}
             );
             //Если произошла ошибка - выбрасываем ее
-            if(!accessToken)
+            if (!accessToken)
                 throw new Error("Error on generating access Token!");
             logger.log("Access Token is: " + accessToken)
 
             //Генерация refresh Token
             logger.log("Generating refresh Token...")
-            const refreshToken: string | undefined = jwt.sign(payload,
+            const refreshToken: string | undefined = jwt.sign({...payload},
                 (process.env.SECRED_CODE_REFRESH as string)
                 , {expiresIn: "7d"}
             );
             //Если произошла ошибка - выбрасываем ее
-            if(!refreshToken)
+            if (!refreshToken)
                 throw new Error("Error on generating refresh Token!");
             logger.log("Refresh Token is: " + refreshToken)
 
@@ -53,7 +55,7 @@ class tokenService{
             }
         } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            logger.warn("Error on generateToken in Token service!")
+            logger.error("Error on generateToken in Token service!")
             logger.error(error);
         }
     }
@@ -65,11 +67,13 @@ class tokenService{
      * @param userId - id пользователя
      * @param refreshToken - refresh Token пользователя
      */
-    async saveToken(userId: string,refreshToken: string): Promise<(mongoose.Document<unknown, any, IToken> & IToken & {_id: mongoose.Types.ObjectId}) | undefined>{
+    async saveToken(userId: string, refreshToken: string)
+        : Promise<(mongoose.Document<unknown, any, IToken> & IToken & { _id: mongoose.Types.ObjectId }) | undefined> {
         try {
             //Поиск существующего token
             logger.log("Searching already exist refreshToken...")
-            const tokenData = await Token.findOne({user: userId});
+            const tokenData: (mongoose.Document<unknown, any, IToken> & IToken & {_id: mongoose.Types.ObjectId}) | null
+                = await Token.findOne({user: userId});
             //Если такой token есть, то обновляем его
             if (tokenData) {
                 logger.log("refreshToken found.")
@@ -78,7 +82,8 @@ class tokenService{
             }
             //Создание нового token
             logger.log("Generating new refresh Token...")
-            const token = await Token.create({user: userId, refreshToken: refreshToken});
+            const token: mongoose.Document<unknown, any, IToken> & IToken & {_id: mongoose.Types.ObjectId} | null
+                = await Token.create({user: userId, refreshToken: refreshToken});
             //Если при генерации произошла ошибка - то выбрасываем ее
             if (!token)
                 throw new Error("Error on creating token on Token service!");
@@ -88,7 +93,7 @@ class tokenService{
             return token;
         } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            logger.warn("Error on saveToken in Token service!")
+            logger.error("Error on saveToken in Token service!")
             logger.error(error);
         }
     }
@@ -99,11 +104,11 @@ class tokenService{
      * @function
      * @param refreshToken - токен для выхода
      */
-    async removeToken(refreshToken: string): Promise<DeleteResult | undefined>{
+    async removeToken(refreshToken: string): Promise<DeleteResult | undefined> {
         try {
             logger.info("Removing Token from DB...")
             //Удаляем токен из БД
-            const tokenData: DeleteResult = await Token.deleteOne({refreshToken: refreshToken});
+            const tokenData: DeleteResult | undefined = await Token.deleteOne({refreshToken: refreshToken});
             //Если там нет такого токена, то выбрасываем ошибку
             if (!tokenData)
                 throw new Error("Error on deleting token in DB!");
@@ -113,7 +118,7 @@ class tokenService{
             return tokenData;
         } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            logger.warn("Error on removeToken in Token service!")
+            logger.error("Error on removeToken in Token service!")
             logger.error(error);
         }
     }
@@ -124,11 +129,12 @@ class tokenService{
      * @method
      * @param refreshToken - текущий refreshToken
      */
-    async findToken(refreshToken: string): Promise<(mongoose.Document<unknown, any, IToken> & IToken & {_id: mongoose.Types.ObjectId}) | undefined>{
+    async findToken(refreshToken: string): Promise<(mongoose.Document<unknown, any, IToken> & IToken & { _id: mongoose.Types.ObjectId }) | undefined> {
         try {
             logger.info("Searching Token in DB...");
             //Удаляем токен из БД
-            const tokenData = await Token.findOne({refreshToken: refreshToken});
+            const tokenData: (mongoose.Document<unknown, any, IToken> & IToken & {_id: mongoose.Types.ObjectId}) | null
+                = await Token.findOne({refreshToken: refreshToken});
             //Если там нет такого токена, то выбрасываем ошибку
             if (!tokenData)
                 throw new Error("Error on deleting token in DB!");
@@ -137,7 +143,7 @@ class tokenService{
             return tokenData;
         } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            logger.warn("Error on removeToken in Token service!")
+            logger.error("Error on removeToken in Token service!")
             logger.error(error);
         }
     }
@@ -148,13 +154,13 @@ class tokenService{
      * @method
      * @param token - токен
      */
-    async validateAccessToken(token: string): Promise<string | jwt.JwtPayload | undefined>{
+    async validateAccessToken(token: string): Promise<string | jwt.JwtPayload | undefined> {
         try {
             //Валидируем токен
             logger.info("Validating Access Token...");
             const userData: string | jwt.JwtPayload = jwt.verify(token, process.env.SECRED_CODE_ACCESS as string);
             //Если произошла ошибка валидации, то выбрасываем ее
-            if(!userData)
+            if (!userData)
                 throw new Error("Error on validate Access Token!");
 
             //Возвращаем данные об этом
@@ -162,7 +168,7 @@ class tokenService{
             return userData;
         } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
-            logger.warn("Error on validateAccessToken in Token service!")
+            logger.error("Error on validateAccessToken in Token service!")
             logger.error(error);
         }
     }
@@ -173,13 +179,13 @@ class tokenService{
      * @method
      * @param token - токен
      */
-    async validateRefreshToken(token: string): Promise<string | jwt.JwtPayload | undefined>{
+    async validateRefreshToken(token: string): Promise<string | jwt.JwtPayload | undefined> {
         try {
             //Валидируем токен
             logger.info("Validating Refresh Token...");
             const userData: string | jwt.JwtPayload = jwt.verify(token, process.env.SECRED_CODE_REFRESH as string);
             //Если произошла ошибка валидации, то выбрасываем ее
-            if(!userData)
+            if (!userData)
                 throw new Error("Error on validate Access Token!");
 
             //Возвращаем данные об этом
@@ -187,7 +193,7 @@ class tokenService{
             return userData;
         } catch (error) {
             //Обрабатываем ошибки и отправляем статус код
-            logger.warn("Error on validateRefreshToken in Token service!")
+            logger.error("Error on validateRefreshToken in Token service!")
             logger.error(error);
         }
     }

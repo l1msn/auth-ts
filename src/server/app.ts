@@ -2,17 +2,18 @@
 import express from 'express';
 import cors from "cors"
 import cookieParser from "cookie-parser";
-import mongoose  from "mongoose";
+import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 dotenv.config();
+
 
 //Инициализация модулей
 import logger from "./logger/logger"
 import router from "./routes/index";
 import errorHandler from "./middleware/errorMiddleware";
 
-class App {
+class App{
     public express: express.Application = express();
 
     constructor() {
@@ -26,7 +27,7 @@ class App {
 
             logger.info("Success load Application.");
         } catch (error: unknown | Error) {
-            logger.warn("Error on creating Application object!");
+            logger.fatal("Error on creating Application object!");
             logger.error(error);
 
         }
@@ -35,14 +36,15 @@ class App {
     private database() {
         try {
             logger.log("Database connecting...");
-
             mongoose.connect(
-                "mongodb://" + process.env.MONGO_HOST as string + ":" + process.env.MONGO_PORT as string + "/" + process.env.MONGO_NAME as string
-            ).catch(()=> {throw new Error("Error on mongoose connect!")});
+                "mongodb://" + process.env.MONGO_HOST + ":" + process.env.MONGO_PORT + "/" + process.env.MONGO_NAME
+            ).catch(() => {
+                throw new Error("Error on mongoose connect!")
+            });
 
             logger.log("Database connected.");
         } catch (error: unknown | any) {
-            logger.warn("Error on connection to DataBase of Application!");
+            logger.fatal("Error on connection to DataBase of Application!");
             logger.error(error);
         }
     }
@@ -63,25 +65,27 @@ class App {
 
             logger.log("Middlewares included.");
         } catch (error: unknown | any) {
-            logger.warn("Error on including middlewares of Application!");
+            logger.fatal("Error on including middlewares of Application!");
             logger.error(error);
         }
     }
+
     private routes() {
         try {
-            logger.log("Middlewares including...");
+            logger.log("Routing including...");
 
             //Маршрутизация
             this.express.use("/auth", router);
 
-            logger.log("Middlewares included.");
+            logger.log("Routing included.");
         } catch (error: unknown | any) {
-            logger.warn("Error on including routes of Application!");
+            logger.fatal("Error on including routes of Application!");
             logger.error(error);
         }
     }
+
     private errors() {
-        try{
+        try {
             logger.log("Error middleware including...");
 
             //Обработчик ошибок
@@ -89,7 +93,7 @@ class App {
 
             logger.log("Error middleware included.");
         } catch (error: unknown | any) {
-            logger.warn("Error on creating including Error Middleware object!");
+            logger.fatal("Error on creating including Error Middleware object!");
             logger.error(error);
         }
     }
