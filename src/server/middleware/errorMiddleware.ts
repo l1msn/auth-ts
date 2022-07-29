@@ -4,6 +4,8 @@ import {NextFunction, Request, Response} from "express";
 import authError from "../exceptions/authError";
 import logger from "../logger/logger"
 
+
+
 /**
  * @description - Функция обработчик ошибок
  * @function

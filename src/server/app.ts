@@ -1,5 +1,7 @@
 //Инициализация библиотек
 import express from 'express';
+import swaggerUI from "swagger-ui-express";
+import swaggerJsDoc from "swagger-jsdoc";
 import cors from "cors"
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
@@ -9,6 +11,7 @@ dotenv.config();
 
 
 //Инициализация модулей
+import swaggerOptions from "./middleware/swagger/swaggerOptions";
 import logger from "./logger/logger"
 import router from "./routes/index";
 import errorHandler from "./middleware/errorMiddleware";
@@ -62,6 +65,8 @@ class App{
                 credentials: true,
                 origin: process.env.CLIENT_URL
             }));
+            //Подключаем SwaggerDoc
+            this.express.use("/api", swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerOptions)));
 
             logger.log("Middlewares included.");
         } catch (error: unknown | any) {

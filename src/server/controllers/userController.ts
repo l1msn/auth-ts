@@ -22,9 +22,10 @@ class UserController {
      * @description - Метод регистрации пользователя
      * @method
      * @async
-     * @param request - запрос
-     * @param response - ответ
-     * @param next - следующая middleware функции
+     * @param request {Request} - запрос
+     * @param response {Response} - ответ
+     * @param next {NextFunction} - следующая middleware функции
+     * @return {Promise<void | Response<any, Record<string, any>>>}
      */
     public async registration(request: Request, response: Response, next: NextFunction)
         : Promise<void | Response<any, Record<string, any>>> {
@@ -49,7 +50,7 @@ class UserController {
                 = await userService.registration(email, password);
             //Если не получается - выбрасываем ошибку
             if (!userData)
-                return next(authError.badRequest("Error on registration!"));
+                return next(authError.badRequest("Error on registration!",["User already exist!"]));
             logger.info("New user is created.");
 
             //Добавляем в cookie refreshToken
@@ -67,9 +68,10 @@ class UserController {
      * @description - Метод авторизации пользователя
      * @method
      * @async
-     * @param request - запрос
-     * @param response - ответ
-     * @param next - следующая middleware функция
+     * @param request {Request} - запрос
+     * @param response {Response} - ответ
+     * @param next {NextFunction} - следующая middleware функции
+     * @return {Promise<void | Response<any, Record<string, any>>>}
      */
     public async login(request: Request, response: Response, next: NextFunction)
         : Promise<void | Response<any, Record<string, any>>> {
@@ -110,9 +112,10 @@ class UserController {
      * @description - Метод выхода из сессии пользователя
      * @method
      * @async
-     * @param request - запрос
-     * @param response - ответ
-     * @param next - следующая middleware функция
+     * @param request {Request} - запрос
+     * @param response {Response} - ответ
+     * @param next {NextFunction} - следующая middleware функции
+     * @return {Promise<void | Response<any, Record<string, any>>>}
      */
     public async logout(request: Request, response: Response, next: NextFunction)
         : Promise<void | Response<any, Record<string, any>>> {
@@ -148,9 +151,10 @@ class UserController {
      * @description - Метод активации пользователя
      * @method
      * @async
-     * @param request - запрос
-     * @param response - ответ
-     * @param next - следующая middleware функция
+     * @param request {Request} - запрос
+     * @param response {Response} - ответ
+     * @param next {NextFunction} - следующая middleware функции
+     * @return {Promise<Response | void>}
      */
     public async activate(request: Request, response: Response, next: NextFunction)
         : Promise<Response | void> {
@@ -178,9 +182,10 @@ class UserController {
      * @description - Метод получения нового refresh token пользователя
      * @method
      * @async
-     * @param request - запрос
-     * @param response - ответ
-     * @param next - следующая middleware функция
+     * @param request {Request} - запрос
+     * @param response {Response} - ответ
+     * @param next {NextFunction} - следующая middleware функции
+     * @return {Promise<void | Response<any, Record<string, any>>>}
      */
     public async refresh(request: Request, response: Response, next: NextFunction)
         : Promise<void | Response<any, Record<string, any>>> {
@@ -215,9 +220,10 @@ class UserController {
      * @description - Метод получения всех пользователей для Admin
      * @method
      * @async
-     * @param request - запрос
-     * @param response - ответ
-     * @param next - следующая middleware функция
+     * @param request {Request} - запрос
+     * @param response {Response} - ответ
+     * @param next {NextFunction} - следующая middleware функции
+     * @return {Promise<void | Response<any, Record<string, any>>>}
      */
     public async getUsers(request: Request, response: Response, next: NextFunction)
         : Promise<void | Response<any, Record<string, any>>> {
