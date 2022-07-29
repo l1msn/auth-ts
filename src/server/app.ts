@@ -16,6 +16,11 @@ import logger from "./logger/logger"
 import router from "./routes/index";
 import errorHandler from "./middleware/errorMiddleware";
 
+
+/**
+ * @description - Основное приложение сервера
+ * @class
+ */
 class App{
     public express: express.Application = express();
 
