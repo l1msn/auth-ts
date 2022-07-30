@@ -352,8 +352,5 @@ router.get("/refresh",
     , userController.refresh);
 router.get("/users", authMiddleware, userController.getUsers);
 
-
-
-
 //Экспортируем данный модуль
 export default router;
