@@ -14,7 +14,7 @@ class userDto {
     //Конструктор
     constructor(model: mongoose.Document<unknown, any, IUser> & IUser & {_id: mongoose.Types.ObjectId} | null) {
         if(!model)
-            throw new Error("Getting null!");
+            throw new Error("Getting nothing, expect User from DB!");
         this.email = model.email;
         this.id = model.id;
         this.isActivated = model.isActivated;
