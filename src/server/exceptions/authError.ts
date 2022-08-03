@@ -5,22 +5,22 @@
  * @extends Error
  */
 class AuthError extends Error {
-    status: number;
-    errors: string[];
+  status: number;
+  errors: string[];
 
-    constructor(status: number, message: string, errors: string[] = []) {
-        super(message);
-        this.status = status;
-        this.errors = errors;
-    }
+  constructor(status: number, message: string, errors: string[] = []) {
+    super(message);
+    this.status = status;
+    this.errors = errors;
+  }
 
-    static unauthorizedError(): AuthError {
-        return new AuthError(401, "User not authorized")
-    }
+  static unauthorizedError(): AuthError {
+    return new AuthError(401, 'User not authorized');
+  }
 
-    static badRequest(message: string, errors: any[] = []): AuthError {
-        return new AuthError(400, message, errors);
-    }
+  static badRequest(message: string, errors: any[] = []): AuthError {
+    return new AuthError(400, message, errors);
+  }
 }
 
 export default AuthError;

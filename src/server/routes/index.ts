@@ -1,12 +1,12 @@
-//Инициализация библиотек
-import {Router} from "express";
+// Инициализация библиотек
+import {Router} from 'express';
 
-//Инициализация модулей
-import routeValidate from "./validators/routeValidate";
-import userController from "../controllers/userController";
-import authMiddleware from "../middleware/authMiddleware";
+// Инициализация модулей
+import routeValidate from './validators/routeValidate';
+import userController from '../controllers/userController';
+import authMiddleware from '../middleware/authMiddleware';
 
-//Инициализируем Роутера
+// Инициализируем Роутера
 const router: Router = Router();
 
 /**
@@ -331,26 +331,26 @@ const router: Router = Router();
  *                              message: Unexpected error from server!
  */
 
-//Запросы Роутера
-//URL, Валидация, Контроллер управления
-router.post("/registration",
+// Запросы Роутера
+// URL, Валидация, Контроллер управления
+router.post('/registration',
     routeValidate.emailValidate(),
     routeValidate.passwordValidate(),
     userController.registration);
-router.post("/login",
+router.post('/login',
     routeValidate.emailValidate(),
     routeValidate.passwordValidate(),
     userController.login);
-router.post("/logout",
+router.post('/logout',
     routeValidate.tokenValidate()
     , userController.logout);
-router.get("/activate/:link",
+router.get('/activate/:link',
     routeValidate.linkValidate()
     , userController.activate);
-router.get("/refresh",
+router.get('/refresh',
     routeValidate.tokenValidate()
     , userController.refresh);
-router.get("/users", authMiddleware, userController.getUsers);
+router.get('/users', authMiddleware, userController.getUsers);
 
-//Экспортируем данный модуль
+// Экспортируем данный модуль
 export default router;
