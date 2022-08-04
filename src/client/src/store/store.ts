@@ -1,7 +1,7 @@
 import IUser from "../models/IUser";
 import {makeAutoObservable} from "mobx";
 import AuthService from "../services/AuthService";
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import AuthResponse from "../models/responses/AuthResponse";
 import {API_URL} from "../http";
 
@@ -22,15 +22,15 @@ class Store {
     }
 
     //Основные мутации полей
-    setAuth(bool: boolean) {
+    setAuth(bool: boolean): void {
         this.isAuth = bool;
     }
 
-    setUser(user: IUser) {
+    setUser(user: IUser): void {
         this.user = user;
     }
 
-    setLoading(bool: boolean) {
+    setLoading(bool: boolean): void {
         this.isLoading = bool;
     }
 
@@ -41,11 +41,11 @@ class Store {
      * @param email - емайл пользователя
      * @param password - пароль пользователя
      */
-    async login(email: string, password: string) {
+    async login(email: string, password: string): Promise<void> {
         try {
             console.log("Login process...");
 
-            const response = await AuthService.login(email, password);
+            const response: AxiosResponse<AuthResponse, any> = await AuthService.login(email, password);
             if(!response)
                 throw new Error("No response");
             console.log(response);
@@ -54,7 +54,7 @@ class Store {
             this.setUser(response.data.user);
 
             console.log("Login success");
-        } catch (error: any) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
             console.log("Error on login in Store")
             console.log(error.response?.data?.message);
@@ -68,11 +68,11 @@ class Store {
      * @param email - емайл пользователя
      * @param password - пароль пользователя
      */
-    async registration(email: string, password: string) {
+    async registration(email: string, password: string): Promise<void> {
         try {
             console.log("Registration process...");
 
-            const response = await AuthService.registration(email, password);
+            const response: AxiosResponse<AuthResponse, any> = await AuthService.registration(email, password);
             if(!response)
                 throw new Error("No response");
             console.log(response);
@@ -82,7 +82,7 @@ class Store {
             this.setUser(response.data.user);
 
             console.log("Registration success");
-        } catch (error: any) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
             console.log("Error on registration in Store")
             console.log(error.response?.data?.message);
@@ -94,7 +94,7 @@ class Store {
      * @method
      * @async
      */
-    async logout() {
+    async logout(): Promise<void> {
         try {
             console.log("Logout process...");
 
@@ -105,7 +105,7 @@ class Store {
             this.setUser({} as IUser);
 
             console.log("Logout success");
-        } catch (error: any) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
             console.log("Error on logout in Store")
             console.log(error.response?.data?.message);
@@ -117,12 +117,12 @@ class Store {
      * @method
      * @async
      */
-    async checkAuth() {
+    async checkAuth(): Promise<void> {
         try {
             console.log("Checking auth...");
 
             this.setLoading(true);
-            const response = await axios.get<AuthResponse>(`${API_URL}/refresh`,{ withCredentials: true });
+            const response: AxiosResponse<AuthResponse, any> = await axios.get<AuthResponse>(`${API_URL}/refresh`,{ withCredentials: true });
             if(!response)
                 throw new Error("No response");
             console.log(response);
@@ -133,7 +133,7 @@ class Store {
 
             console.log("Auth success")
 
-        } catch (error: any) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
             console.log("Error on checkAuth in Store")
             console.log(error.response?.data?.message);

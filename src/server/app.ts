@@ -3,6 +3,7 @@ import express from 'express';
 import swaggerUI from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
 import cors from 'cors';
+import {graphqlHTTP} from 'express-graphql';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -12,6 +13,7 @@ import swaggerOptions from './middleware/swagger/swaggerOptions';
 import logger from './logger/logger';
 import router from './routes/index';
 import errorHandler from './middleware/errorMiddleware';
+import graphUserModel from './models/graphqlSchemas/graphUserModel';
 
 dotenv.config();
 
@@ -69,6 +71,14 @@ class App {
       }));
       // Подключаем SwaggerDoc
       this.express.use('/api', swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerOptions)));
+
+      this.express.use(
+          '/graphql',
+          graphqlHTTP({
+            schema: graphUserModel,
+            graphiql: true,
+          }),
+      );
 
       logger.log('Middlewares included.');
     } catch (error: unknown | any) {

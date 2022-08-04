@@ -7,10 +7,10 @@ interface State {
     store: Store,
 }
 
-const store = new Store();
+const store: Store = new Store();
 
 //Создадим контекст для получения данных
-export const Context = createContext<State>({
+export const Context: React.Context<State> = createContext<State>({
     store,
 })
 

@@ -2,8 +2,8 @@ import React, {FC, useContext, useState} from 'react';
 import {Context} from "../index";
 import {observer} from "mobx-react-lite";
 
-//Основная форма аунтификации - Функциональный react component
-const LoginForm: FC = () => {
+//Основная форма аутентификации - Функциональный react component
+const LoginForm: FC = (): JSX.Element => {
     //Создаем 2 локальных состояния для данных
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');

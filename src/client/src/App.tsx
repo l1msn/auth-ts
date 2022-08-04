@@ -4,8 +4,9 @@ import {Context} from "./index";
 import {observer} from "mobx-react-lite";
 import IUser from "./models/IUser";
 import UserService from "./services/UserService";
+import {AxiosResponse} from "axios";
 
-const App: FC = () => {
+const App: FC = (): JSX.Element => {
     const {store} = useContext(Context);
     //Создаем локальное состояние для списка пользователей
     const [users, setUsers] = useState<IUser[]>([]);
@@ -21,16 +22,16 @@ const App: FC = () => {
      * @async
      * @method
      */
-    async function getUsers() {
+    async function getUsers(): Promise<void> {
         try {
             console.log("Getting users...");
-            const response = await UserService.fetchUsers();
+            const response: AxiosResponse<IUser[], any> = await UserService.fetchUsers();
             if(!response)
                 throw new Error("Cannot fetch api - users");
 
             setUsers(response.data);
 
-        } catch (error: any) {
+        } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код
             console.log("Error on getUsers in App")
             console.log(error.response?.data?.message);
