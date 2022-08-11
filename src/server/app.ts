@@ -13,7 +13,7 @@ import swaggerOptions from './middleware/swagger/swaggerOptions';
 import logger from './logger/logger';
 import router from './routes/index';
 import errorHandler from './middleware/errorMiddleware';
-import graphUserModel from './models/graphqlSchemas/graphUserModel';
+import graphqlSchemas from './models/graphqlSchemas';
 
 dotenv.config();
 
@@ -72,13 +72,13 @@ class App {
       // Подключаем SwaggerDoc
       this.express.use('/api', swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerOptions)));
 
-      this.express.use(
-          '/graphql',
+      this.express.use('/graphql',
           graphqlHTTP({
-            schema: graphUserModel,
+            schema: graphqlSchemas,
             graphiql: true,
           }),
       );
+
 
       logger.log('Middlewares included.');
     } catch (error: unknown | any) {

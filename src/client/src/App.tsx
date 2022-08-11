@@ -30,6 +30,7 @@ const App: FC = (): JSX.Element => {
                 throw new Error("Cannot fetch api - users");
 
             setUsers(response.data);
+            console.log("Gutted all users.");
 
         } catch (error: unknown | any) {
             //Обрабатываем ошибки и отправляем статус код

@@ -4,7 +4,7 @@ import app from '../app';
 
 describe('Correct working a request validation handler', () => {
   test('Sending registration request and getting response - without body of request', async ()=> {
-    const response = await request(app).post('/auth/registration');
+    const response: request.Response = await request(app).post('/auth/registration');
     expect(response.statusCode).toEqual(400);
     expect(response.body).toEqual({
       'message': 'Validation error!',
@@ -33,7 +33,7 @@ describe('Correct working a request validation handler', () => {
     });
   });
   test('Sending registration request and getting response - with wrong body format', async () => {
-    const response = await request(app).post('/auth/registration')
+    const response: request.Response = await request(app).post('/auth/registration')
         .send({
           'email': 'chakachakovichgmail.com',
           'password': '1234',
@@ -52,7 +52,7 @@ describe('Correct working a request validation handler', () => {
     });
   });
   test('Sending login request and getting response - without body of request', async ()=> {
-    const response = await request(app).post('/auth/login');
+    const response: request.Response = await request(app).post('/auth/login');
     expect(response.statusCode).toEqual(400);
     expect(response.body).toEqual({
       'message': 'Validation error!',
@@ -81,7 +81,7 @@ describe('Correct working a request validation handler', () => {
     });
   });
   test('Sending login request and getting response - with wrong body format', async () => {
-    const response = await request(app).post('/auth/login')
+    const response: request.Response = await request(app).post('/auth/login')
         .send({
           'email': 'chakachakovichgmail.com',
           'password': '1234',

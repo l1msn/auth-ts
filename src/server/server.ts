@@ -7,4 +7,5 @@ app.listen(process.env.PORT, () => {
         'mongodb://' + process.env.MONGO_HOST + ':' +
         process.env.MONGO_PORT + '/' + process.env.MONGO_NAME);
   logger.info('Swagger API is working on http://localhost:' + process.env.PORT + '/api');
+  logger.info('GraphQL interface working on http://localhost:' + process.env.PORT + '/graphql/');
 });

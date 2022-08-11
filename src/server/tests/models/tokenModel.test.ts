@@ -1,12 +1,12 @@
 import Token from '../../models/tokenModel';
+import IToken from '../../models/IModels/iToken';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
 dotenv.config();
 
-const testUser = {
+const testUser: {refreshToken: string} = {
   refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNoYWthY2hha292aWNoQGdtYWlsLmNvbSIsImlkIjoiNjJlMmFiNWU0MGY0YTYwNmY0YjdiYWM0IiwiaXNBY3RpdmF0ZWQiOmZhbHNlLCJpYXQiOjE2NTkwMjI1MjIsImV4cCI6MTY1OTYyNzMyMn0.xnwRvqoVPjMdwky8x97Ygi2z8C-WCvM3pYNOqx_QRBU',
-
 };
 
 const newRefreshToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNoYWthY2hha292aWNoQGdtYWlsLmNvbSIsImlkIjoiNjJlMmI1OWY0MGY3MWY1NTZjNmFmOWVjIiwiaXNBY3RpdmF0ZWQiOmZhbHNlLCJpYXQiOjE2NTkwMjQ3OTksImV4cCI6MTY1OTYyOTU5OX0.VvAllGVj7G76Et_nBV3fxDUGxY47lQkyDA8-SYbEKzY';
@@ -21,7 +21,8 @@ describe('Correct work with Token Model', ()=>{
   test('Adding and searching Token in Database', async ()=>{
     await Token.create({refreshToken: testUser.refreshToken});
 
-    const newToken = await Token.findOne({refreshToken: testUser.refreshToken});
+    const newToken: (mongoose.Document<unknown, any, IToken> & IToken & {_id: mongoose.Types.ObjectId}) | null =
+        await Token.findOne({refreshToken: testUser.refreshToken});
 
     expect(newToken!.refreshToken).toEqual(testUser.refreshToken);
   });
@@ -32,13 +33,15 @@ describe('Correct work with Token Model', ()=>{
         {refreshToken: newRefreshToken},
     );
 
-    const newRefreshTokenObject = await Token.findOne({refreshToken: newRefreshToken});
+    const newRefreshTokenObject: (mongoose.Document<unknown, any, IToken> & IToken & {_id: mongoose.Types.ObjectId}) | null =
+        await Token.findOne({refreshToken: newRefreshToken});
 
     expect(newRefreshTokenObject!.refreshToken).toEqual(newRefreshToken);
 
     await Token.findOneAndDelete({email: newRefreshToken});
 
-    const deletedToken = await Token.findOne({email: newRefreshToken});
+    const deletedToken: (mongoose.Document<unknown, any, IToken> & IToken & {_id: mongoose.Types.ObjectId}) | null =
+        await Token.findOne({email: newRefreshToken});
 
     expect(deletedToken).toBeNull();
   });

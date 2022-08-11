@@ -1,11 +1,12 @@
 import UserDto from '../../dtos/userDto';
 import User from '../../models/userModel';
+import IUser from '../../models/IModels/iUser';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const testUser = {
+const testUser: {email: string, password: string, isActivated: string} = {
   email: 'email@gmail.com',
   password: '1234',
   isActivated: 'false',
@@ -27,9 +28,10 @@ describe('UserDto testing', ()=> {
         },
     );
 
-    const newUser = await User.findOne({email: testUser.email});
+    const newUser: (mongoose.Document<unknown, any, IUser> & IUser & {_id: mongoose.Types.ObjectId}) | null =
+        await User.findOne({email: testUser.email});
 
-    const newUserDto = new UserDto(newUser);
+    const newUserDto: UserDto = new UserDto(newUser);
 
     expect(newUserDto.email).toEqual(testUser.email);
 
