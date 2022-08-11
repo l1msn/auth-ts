@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 interface IToken extends Document {
     User: mongoose.Types.ObjectId;
