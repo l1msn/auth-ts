@@ -11,12 +11,12 @@ services:
     container_name: server
     build:
       context: ./
-      dockerfile: ./src/server/DockerfileServer
+      dockerfile: src/server/Dockerfile
     env_file:
       - .env
     volumes:
-      - ./:/auth-ts
-      - /auth-ts/node_modules
+      - ./server/:/auth-ts/src/server
+      - ./node_modules
     ports:
       - 5000:5000
     command: npm run start
@@ -27,13 +27,10 @@ services:
       container_name: client
       build:
         context: ./src/client
-        dockerfile: DockerfileClient
-      volumes:
-        - ./:/auth-ts/src/client
-        - /auth-ts/src/client/node_modules
+        dockerfile: Dockerfile
       ports:
         - 3000:3000
-      command: npm run start
+      command: npm run deploy
       depends_on:
         - server
       restart: always

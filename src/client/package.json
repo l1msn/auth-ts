@@ -15,10 +15,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && move build ../../dist/client && rd -r build",
+    "build": "react-scripts build",
+    "build:custom": "react-scripts build && mkdirp ../../dist && move build ../../dist/client && rd -r build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "serve -s ../../dist/client/build"
+    "deploy": "serve -s build",
+    "deploy:custom": "serve -s ../../dist/client/build"
   },
   "eslintConfig": {
     "extends": [

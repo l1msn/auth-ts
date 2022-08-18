@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./dist/server/server.js",
     "build": "tsc",
-    "dev": "nodemon ./src/server/server.ts",
+    "dev": "node ./src/server/server.ts",
     "test": "jest --verbose true",
     "dev:test": "jest --watch",
     "lint": "eslint ./src",
