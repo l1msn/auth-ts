@@ -1,0 +1,23 @@
+FROM node
+
+RUN mkdir -p /auth-ts/src/server
+
+RUN mkdir -p /auth-ts/dist/server
+
+WORKDIR /auth-ts
+
+COPY ../../package*.json /auth-ts
+
+COPY ../../tsconfig.json /auth-ts
+
+COPY ../../.env /auth-ts
+
+COPY . /auth-ts/src/server
+
+RUN npm install
+
+RUN npm run build
+
+EXPOSE 5000
+
+CMD ["npm", "run", "start"]

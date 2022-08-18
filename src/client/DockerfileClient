@@ -1,0 +1,19 @@
+FROM node
+
+RUN mkdir -p /auth-ts/src/client
+
+RUN mkdir -p /auth-ts/dist/client
+
+WORKDIR /auth-ts/src/client
+
+COPY package*.json /auth-ts/src/client
+
+COPY tsconfig.json /auth-ts/src/client
+
+RUN npm install
+
+COPY . /auth-ts/src/client
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start"]
