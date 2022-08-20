@@ -1,11 +1,19 @@
 FROM node
 
-WORKDIR /auth-pro/server
+RUN mkdir -p auth-ts/src/server
 
-COPY package*.json ./
+WORKDIR /auth-ts
+
+COPY ../../package*.json .
+
+COPY ../../tsconfig.json .
+
+COPY ../../.env .
+
+COPY /src/server/ /auth-ts/src/server/
 
 RUN npm install
 
-COPY . .
+RUN npm run build
 
-CMD ["node", "server.js"]
+CMD ["npm", "run", "start:build"]

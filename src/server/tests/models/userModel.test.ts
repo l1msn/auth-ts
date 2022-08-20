@@ -12,8 +12,6 @@ const testUser: {email: string, password: string} = {
 
 const newEmail = '111@mail.com';
 
-jest.mock('../../models/userModel');
-
 describe('Correct work with User Model', ()=>{
   beforeAll(async ()=> {
     await mongoose.connect('mongodb://' + process.env.MONGO_HOST +

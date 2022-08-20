@@ -10,27 +10,26 @@ services:
   server:
     container_name: server
     build:
-      context: server
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: src/server/Dockerfile
     env_file:
-      - server/.env
+      - .env
     volumes:
-      - .:/server
-      - /auth_modules/node_modules
+      - ./node_modules
     ports:
       - 5000:5000
-    command: node server.js
+    command: npm run start:build
     depends_on:
       - mongo
     restart: always
   client:
       container_name: client
       build:
-        context: client
+        context: ./src/client
         dockerfile: Dockerfile
       ports:
         - 3000:3000
-      command: npm run start
+      command: npm run deploy
       depends_on:
         - server
       restart: always
