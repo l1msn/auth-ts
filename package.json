@@ -4,7 +4,8 @@
   "description": "Serverside of app",
   "main": "index.js",
   "scripts": {
-    "start": "node ./dist/server/server.js",
+    "start:build": "node ./dist/server/server.js",
+    "start": "ts-node ./src/server/server.ts",
     "build": "tsc",
     "dev": "node ./src/server/server.ts",
     "test": "jest --verbose true",
@@ -13,7 +14,7 @@
     "lint:fix": "eslint ./src --fix"
   },
   "keywords": [],
-  "author": "",
+  "author": "l1msn",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -44,7 +44,7 @@ class App {
     try {
       logger.log('Database connecting...');
       mongoose.connect(
-          'mongodb://' + process.env.MONGO_HOST + ':' + process.env.MONGO_PORT + '/' + process.env.MONGO_NAME,
+          'mongodb://' + process.env.MONGO_HOST_DOCKER + ':' + process.env.MONGO_PORT + '/' + process.env.MONGO_NAME,
       ).catch(() => {
         throw new Error('Error on mongoose connect!');
       });

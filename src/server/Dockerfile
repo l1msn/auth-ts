@@ -2,18 +2,18 @@ FROM node
 
 RUN mkdir -p auth-ts/src/server
 
-RUN mkdir -p auth-ts/dist/server
-
 WORKDIR /auth-ts
 
-COPY ../../package*.json ./
+COPY ../../package*.json .
 
-COPY ../../tsconfig.json ./
+COPY ../../tsconfig.json .
 
-COPY ../../.env ./
+COPY ../../.env .
 
-COPY . ./src/server
+COPY /src/server/ /auth-ts/src/server/
 
 RUN npm install
 
-CMD ["npm", "run", "start"]
+RUN npm run build
+
+CMD ["npm", "run", "start:build"]
