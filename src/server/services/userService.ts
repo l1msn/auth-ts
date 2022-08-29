@@ -239,7 +239,7 @@ class userService {
       }
 
       // Проводим валидацию самого Токена
-      const userData: Promise<string | JwtPayload | undefined> | undefined =
+      const userData: string | JwtPayload | undefined | undefined =
                 tokenService.validateRefreshToken(refreshToken);
       // Если валидация неудачная, то выбрасываем ошибку
       if (!userData) {
@@ -258,9 +258,7 @@ class userService {
       logger.log('Creating Dto for user...');
 
       const user: mongoose.Document<unknown, any, IUser> & IUser & { _id: mongoose.Types.ObjectId } | null =
-                await User.findOne(userData.then((id) => {
-                  return id;
-                }));
+                await User.findOne(userData.id);
       const userDto: UserDto | undefined = new UserDto(user);
       // Если не удается создать - то выбрасываем ошибку
       if (!userDto) {
