@@ -7,7 +7,7 @@
     "start:build": "node ./dist/server/server.js",
     "start": "ts-node ./src/server/server.ts",
     "build": "tsc",
-    "dev": "node ./src/server/server.ts",
+    "dev": "nodemon ./src/server/server.ts",
     "test": "jest --verbose true",
     "dev:test": "jest --watch",
     "lint": "eslint ./src",
